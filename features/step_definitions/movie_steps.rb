@@ -23,8 +23,7 @@ Then /I should see "(.*)" before "(.*)"/ do |e1, e2|
 #  else
 #    index1.should < index2
 #  end
-  #page.text.should =~ /.*#{e1}.*#{e2}/m
-  /.*#{e1}.*#{e2}/.match(page.text)
+  page.text.should =~ /.*#{e1}.*#{e2}/m
 end
 
 # Make it easier to express checking or unchecking several boxes at once
@@ -35,15 +34,18 @@ When /I (un)?check the following ratings: (.*)/ do |uncheck, rating_list|
   # HINT: use String#split to split up the rating_list, then
   #   iterate over the ratings and reuse the "When I check..." or
   #   "When I uncheck..." steps in lines 89-95 of web_steps.rb
-  rating_list.split().each do |rating|
-    step %{I #{uncheck ? "uncheck" : "check"} "ratings_#{rating}"}
-    #check("ratings[#{rating}]")
+  rating_list.split.each do |rating|
+    step %Q{I #{ uncheck ? "uncheck" : "check" } "ratings_#{rating}"}
+    #step %Q{the "ratings_#{rating}" checkbox should#{ uncheck ? " not" : "" } be checked}
+    #uncheck ? uncheck("ratings[#{rating}]") : check("ratings[#{rating}]")
+    #puts page.text
   end
 end
 
 When /I (un)?check all the ratings/ do |uncheck|
   Movie.all_ratings.each do |rating|
     step %{I #{ uncheck ? "uncheck" : "check" } "ratings_#{rating}"}
+    #uncheck ? uncheck("ratings[#{rating}]") : check("ratings[#{rating}]")
   end
 end
 
@@ -51,4 +53,5 @@ Then /I should see (all|none) of the movies/ do |see|
   Movie.select(:title).map(&:title).each do |movie|
     step %Q{I should #{see == "none" ? "not" : ""} see "#{movie}"}
   end
+  #puts page.text
 end
